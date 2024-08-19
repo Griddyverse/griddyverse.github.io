@@ -190,23 +190,23 @@
     </div>
 
     <script>
-        // Function to encode URI components
-        function encodePath(path) {
-            return encodeURIComponent(path).replace(/%20/g, ' ');
-        }
+    let currentAudio = null;
 
-        async function loadSoundtracks() {
-            try {
-                const response = await fetch('soundtracks.json');
+    function encodePath(path) {
+        return encodeURIComponent(path).replace(/%20/g, ' ');
+    }
+
+    function loadSoundtracks() {
+        fetch('soundtracks.json')
+            .then(response => {
                 if (!response.ok) {
-                    throw new Error(`Network response was not ok: ${response.statusText}`);
+                    throw new Error('Network response was not ok');
                 }
-                const data = await response.json();
-
+                return response.json();
+            })
+            .then(data => {
                 const soundtracks = data.soundtracks;
                 const container = document.getElementById('soundtracks-container');
-
-                // Clear the loading text
                 container.innerHTML = '';
 
                 if (!soundtracks || soundtracks.length === 0) {
@@ -248,13 +248,23 @@
                         source.type = 'audio/mpeg';
                         audio.appendChild(source);
 
-                        // Add an event listener to update the currently playing track
+                        // Add event listener for audio play
                         audio.addEventListener('play', () => {
-                            document.getElementById('currently-playing').textContent = `Now playing: ${track.name} from ${soundtrack.album}`;
+                            if (currentAudio && currentAudio !== audio) {
+                                currentAudio.pause();
+                                currentAudio.currentTime = 0; // Reset previous audio to 0
+                            }
+                            currentAudio = audio;
+                            document.getElementById('now-playing-text').textContent = `Now playing: ${track.name} from ${soundtrack.album}`;
+                            document.getElementById('album-cover').src = `Games/${encodePath(soundtrack.gameName)}/${encodePath(soundtrack.album)}/Cover.jpg`;
+                            document.getElementById('album-cover').style.display = 'inline';
                         });
 
+                        // Add event listener for audio pause
                         audio.addEventListener('pause', () => {
-                            document.getElementById('currently-playing').textContent = `Paused: ${track.name} from ${soundtrack.album}`;
+                            if (currentAudio === audio) {
+                                document.getElementById('now-playing-text').textContent = `Paused: ${track.name} from ${soundtrack.album}`;
+                            }
                         });
 
                         trackInfo.appendChild(trackTitle);
@@ -280,31 +290,50 @@
                 });
 
                 container.appendChild(grid);
-            } catch (error) {
+            })
+            .catch(error => {
                 console.error('Error loading soundtracks:', error);
                 const container = document.getElementById('soundtracks-container');
                 container.innerHTML = '<p>There was an error loading the soundtracks.</p>';
-            }
-        }
-
-        function filterSoundtracks() {
-            const input = document.getElementById('search-input');
-            const filter = input.value.toLowerCase();
-            const soundtracks = document.querySelectorAll('.soundtrack');
-
-            soundtracks.forEach(soundtrack => {
-                const title = soundtrack.querySelector('h2').textContent.toLowerCase();
-                if (title.includes(filter)) {
-                    soundtrack.style.display = '';
-                } else {
-                    soundtrack.style.display = 'none';
-                }
             });
+    }
+
+    function filterSoundtracks() {
+        const input = document.getElementById('search-input');
+        const filter = input.value.toLowerCase();
+        const soundtracks = document.querySelectorAll('.soundtrack');
+
+        soundtracks.forEach(soundtrack => {
+            const title = soundtrack.querySelector('h2').textContent.toLowerCase();
+            soundtrack.style.display = title.includes(filter) ? '' : 'none';
+        });
+    }
+
+    document.getElementById('search-input').addEventListener('input', filterSoundtracks);
+
+    document.getElementById('play-btn').addEventListener('click', () => {
+        if (currentAudio && currentAudio.paused) {
+            currentAudio.play();
         }
+    });
 
-        document.getElementById('search-input').addEventListener('input', filterSoundtracks);
+    document.getElementById('pause-btn').addEventListener('click', () => {
+        if (currentAudio) {
+            currentAudio.pause();
+        }
+    });
 
-        document.addEventListener('DOMContentLoaded', loadSoundtracks);
-    </script>
+    document.getElementById('stop-btn').addEventListener('click', () => {
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio.currentTime = 0;
+            document.getElementById('now-playing-text').textContent = 'No song is playing.';
+            document.getElementById('album-cover').style.display = 'none';
+            currentAudio = null; // Reset currentAudio
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', loadSoundtracks);
+</script>
 </body>
 </html>
