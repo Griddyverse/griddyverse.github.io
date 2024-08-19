@@ -1,151 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Game Soundtracks</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f4;
-      color: #333;
-    }
-    .container {
-      width: 80%;
-      margin: auto;
-      overflow: hidden;
-    }
-    header {
-      background: #333;
-      color: #fff;
-      padding-top: 30px;
-      min-height: 70px;
-      border-bottom: #fff 3px solid;
-      text-align: center;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 24px;
-    }
-    .soundtrack {
-      background: #fff;
-      border: 1px solid #ddd;
-      margin-bottom: 20px;
-      padding: 20px;
-      border-radius: 5px;
-    }
-    .soundtrack img {
-      width: 100%;
-      max-width: 300px;
-      border-radius: 5px;
-    }
-    .soundtrack h2 {
-      margin-top: 0;
-    }
-    .track {
-      margin-top: 10px;
-    }
-    audio {
-      width: 100%;
-      margin-top: 5px;
-    }
-    .download-btn {
-      display: inline-block;
-      padding: 10px 20px;
-      margin-top: 5px;
-      background-color: #333;
-      color: #fff;
-      text-decoration: none;
-      border-radius: 5px;
-    }
-    .download-btn:hover {
-      background-color: #555;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Soundtracks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        header {
+            width: 100%;
+            padding: 15px 30px;
+            background-color: #1e1e1e;
+            color: #ffffff;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            border-bottom: 2px solid #333;
+            margin-bottom: 20px;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            padding: 20px;
+            background-color: #1e1e1e;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            text-align: center;
+            overflow-y: auto;
+            max-height: 80vh;
+        }
+        .soundtrack {
+            background-color: #2c2c2c;
+            border: 1px solid #333;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        .soundtrack:hover {
+            background-color: #333;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        .soundtrack img {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        .soundtrack h2 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            color: #ffffff;
+        }
+        .track {
+            margin-top: 10px;
+            padding: 10px;
+            border-top: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .track:first-of-type {
+            border-top: none;
+        }
+        .track p {
+            margin: 0;
+            font-size: 1rem;
+            color: #e0e0e0;
+        }
+        audio {
+            width: 100%;
+            margin-top: 5px;
+        }
+        .download-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 5px;
+            background-color: #333;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .download-btn:hover {
+            background-color: #555;
+            transform: scale(1.05);
+        }
+        @media screen and (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            .soundtrack {
+                padding: 15px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <div class="container">
-      <h1>Game Soundtracks</h1>
+    <header>
+        <h1>Game Soundtracks</h1>
+    </header>
+    <div class="container" id="soundtracks-container">
+        <p>Loading soundtracks...</p>
     </div>
-  </header>
-  <div class="container" id="soundtracks-container">
-    <!-- Soundtracks will be loaded here -->
-  </div>
-  <script>
-    async function loadSoundtracks() {
-      try {
-        console.log('Fetching soundtracks.json...');
-        const response = await fetch('soundtracks.json');
-        if (!response.ok) {
-          throw new Error(`Network response was not ok: ${response.statusText}`);
+    <script>
+        // Function to encode URI components
+        function encodePath(path) {
+            return encodeURIComponent(path).replace(/%20/g, ' ');
         }
 
-        console.log('Parsing JSON...');
-        const data = await response.json();
-        console.log('Soundtracks data:', data);
+        async function loadSoundtracks() {
+            try {
+                const response = await fetch('soundtracks.json');
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok: ${response.statusText}`);
+                }
+                const data = await response.json();
 
-        const soundtracks = data.soundtracks;
-        const container = document.getElementById('soundtracks-container');
+                const soundtracks = data.soundtracks;
+                const container = document.getElementById('soundtracks-container');
+                
+                if (!soundtracks || soundtracks.length === 0) {
+                    container.innerHTML = '<p>No soundtracks available.</p>';
+                    return;
+                }
 
-        if (!soundtracks || soundtracks.length === 0) {
-          container.innerHTML = '<p>No soundtracks available.</p>';
-          return;
+                soundtracks.forEach(soundtrack => {
+                    const soundtrackElement = document.createElement('div');
+                    soundtrackElement.className = 'soundtrack';
+
+                    const coverImage = document.createElement('img');
+                    coverImage.src = `Games/${encodePath(soundtrack.gameName)}/${encodePath(soundtrack.album)}/Cover.jpg`;
+                    coverImage.alt = `${soundtrack.album} Cover`;
+
+                    const title = document.createElement('h2');
+                    title.textContent = `${soundtrack.gameName} - ${soundtrack.album}`;
+
+                    soundtrackElement.appendChild(coverImage);
+                    soundtrackElement.appendChild(title);
+
+                    soundtrack.tracks.forEach(track => {
+                        const trackElement = document.createElement('div');
+                        trackElement.className = 'track';
+
+                        const trackTitle = document.createElement('p');
+                        trackTitle.textContent = track.name;
+
+                        const audio = document.createElement('audio');
+                        audio.controls = true;
+                        const source = document.createElement('source');
+                        source.src = `Games/${encodePath(soundtrack.gameName)}/${encodePath(soundtrack.album)}/${encodePath(track.file)}`;
+                        source.type = 'audio/mpeg';
+                        audio.appendChild(source);
+
+                        const downloadButton = document.createElement('a');
+                        downloadButton.href = `Games/${encodePath(soundtrack.gameName)}/${encodePath(soundtrack.album)}/${encodePath(track.file)}`;
+                        downloadButton.className = 'download-btn';
+                        downloadButton.download = track.file;
+                        downloadButton.textContent = 'Download';
+
+                        trackElement.appendChild(trackTitle);
+                        trackElement.appendChild(audio);
+                        trackElement.appendChild(downloadButton);
+
+                        soundtrackElement.appendChild(trackElement);
+                    });
+
+                    container.appendChild(soundtrackElement);
+                });
+            } catch (error) {
+                console.error('Error loading soundtracks:', error);
+                const container = document.getElementById('soundtracks-container');
+                container.innerHTML = '<p>There was an error loading the soundtracks.</p>';
+            }
         }
 
-        soundtracks.forEach(soundtrack => {
-          const soundtrackElement = document.createElement('div');
-          soundtrackElement.className = 'soundtrack';
-
-          const coverImage = document.createElement('img');
-          coverImage.src = `Games/${encodeURIComponent(soundtrack.gameName)}/${encodeURIComponent(soundtrack.album)}/Cover.jpg`;
-          coverImage.alt = `${soundtrack.album} Cover`;
-
-          const title = document.createElement('h2');
-          title.textContent = `${soundtrack.gameName} - ${soundtrack.album}`;
-
-          soundtrackElement.appendChild(coverImage);
-          soundtrackElement.appendChild(title);
-
-          soundtrack.tracks.forEach(track => {
-            const trackElement = document.createElement('div');
-            trackElement.className = 'track';
-
-            const trackTitle = document.createElement('p');
-            trackTitle.textContent = track.name;
-
-            const audio = document.createElement('audio');
-            audio.controls = true;
-            const source = document.createElement('source');
-            source.src = `Games/${encodeURIComponent(soundtrack.gameName)}/${encodeURIComponent(soundtrack.album)}/${encodeURIComponent(track.file)}`;
-            source.type = 'audio/mpeg';
-            audio.appendChild(source);
-
-            const downloadButton = document.createElement('a');
-            downloadButton.href = `Games/${encodeURIComponent(soundtrack.gameName)}/${encodeURIComponent(soundtrack.album)}/${encodeURIComponent(track.file)}`;
-            downloadButton.className = 'download-btn';
-            downloadButton.download = track.file;
-            downloadButton.textContent = 'Download';
-
-            trackElement.appendChild(trackTitle);
-            trackElement.appendChild(audio);
-            trackElement.appendChild(downloadButton);
-
-            soundtrackElement.appendChild(trackElement);
-          });
-
-          container.appendChild(soundtrackElement);
-        });
-      } catch (error) {
-        console.error('Error loading soundtracks:', error);
-        const container = document.getElementById('soundtracks-container');
-        container.innerHTML = `<p>There was an error loading the soundtracks: ${error.message}</p>`;
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', loadSoundtracks);
-  </script>
+        document.addEventListener('DOMContentLoaded', loadSoundtracks);
+    </script>
 </body>
 </html>
