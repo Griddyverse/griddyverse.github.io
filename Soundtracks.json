@@ -1,0 +1,116 @@
+{
+    "soundtracks": [
+        {
+            "gameName": "Overwatch 2",
+            "album": "Overwatch 2 Original Soundtrack",
+            "cover": "Cover.jpg",
+            "tracks": [
+                {
+                    "name": "A New Era",
+                    "file": "01. A New Era.mp3"
+                },
+                {
+                    "name": "Midtown",
+                    "file": "02. Midtown.mp3"
+                },
+                {
+                    "name": "Zero Hour",
+                    "file": "03. Zero Hour.mp3"
+                },
+                {
+                    "name": "Kiriko Origin",
+                    "file": "04. Kiriko Origin.mp3"
+                },
+                {
+                    "name": "Answering The Call",
+                    "file": "05. Answering The Call.mp3"
+                },
+                {
+                    "name": "Esperança",
+                    "file": "06. Esperança.mp3"
+                },
+                {
+                    "name": "Kiriko",
+                    "file": "07. Kiriko.mp3"
+                },
+                {
+                    "name": "We Press On",
+                    "file": "08. We Press On.mp3"
+                },
+                {
+                    "name": "Antarctic Penninsula",
+                    "file": "09. Antarctic Penninsula.mp3"
+                },
+                {
+                    "name": "Colosseo",
+                    "file": "10. Colosseo.mp3"
+                },
+                {
+                    "name": "Lifeweaver Origin",
+                    "file": "11. Lifeweaver Origin.mp3"
+                },
+                {
+                    "name": "Circuit Royal",
+                    "file": "12. Circuit Royal.mp3"
+                },
+                {
+                    "name": "Null Sector",
+                    "file": "13. Null Sector.mp3"
+                },
+                {
+                    "name": "Junker Queen Origin",
+                    "file": "14. Junker Queen Origin.mp3"
+                },
+                {
+                    "name": "Loverwatch",
+                    "file": "15. Loverwatch.mp3"
+                },
+                {
+                    "name": "Shambali Monastery",
+                    "file": "16. Shambali Monastery.mp3"
+                },
+                {
+                    "name": "New Blood",
+                    "file": "17. New Blood.mp3"
+                },
+                {
+                    "name": "Cyber Demon Genji",
+                    "file": "18. Cyber Demon Genji.mp3"
+                },
+                {
+                    "name": "Paraíso",
+                    "file": "19. Paraíso.mp3"
+                },
+                {
+                    "name": "New Queen Street",
+                    "file": "20. New Queen Street.mp3"
+                },
+                {
+                    "name": "Starwatch",
+                    "file": "21. Starwatch.mp3"
+                },
+                {
+                    "name": "Ramattra Origin",
+                    "file": "22. Ramattra Origin.mp3"
+                },
+                {
+                    "name": "Wrath of the Bride",
+                    "file": "23. Wrath of the Bride.mp3"
+                },
+                {
+                    "name": "The Wastelander",
+                    "file": "24. The Wastelander.mp3"
+                },
+                {
+                    "name": "Sojourn Origin",
+                    "file": "25. Sojourn Origin.mp3"
+                },
+                {
+                    "name": "Flow (Bonus Track)",
+                    "file": "26. Flow (Bonus Track).mp3"
+                }
+            ]
+        }
+        // Add more soundtracks here if needed
+    ]
+}
