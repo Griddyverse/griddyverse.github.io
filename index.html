@@ -76,7 +76,7 @@
 
         .soundtrack-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
         }
 
@@ -86,7 +86,6 @@
             padding: 15px;
             border-radius: 10px;
             transition: background-color 0.3s, box-shadow 0.3s;
-            text-align: left;
         }
 
         .soundtrack:hover {
@@ -94,11 +93,23 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
         }
 
-        .soundtrack img {
-            width: 100%;
-            max-width: 250px;
-            border-radius: 10px;
+        .soundtrack-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 10px;
+        }
+
+        .soundtrack img {
+            width: 120px;
+            border-radius: 10px;
+            margin-right: 20px;
+        }
+
+        .soundtrack-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .soundtrack h2 {
@@ -107,16 +118,14 @@
             color: #ffffff;
         }
 
+        /* Collapsible Track List */
         .track-list {
-            display: flex;
+            display: none;
             flex-direction: column;
             gap: 4px;
         }
 
         .track {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
             padding: 6px;
             border-radius: 4px;
             background-color: #333;
@@ -130,18 +139,28 @@
         .track-info {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 10px;
         }
 
-        .track p {
-            margin: 0;
-            font-size: 0.85rem;
-            color: #e0e0e0;
+        .track-title {
+            font-size: 0.9rem;
+            color: #ffffff;
         }
 
         audio {
-            width: 130px;
+            width: 100px;
             height: 28px;
+        }
+
+        .dropdown {
+            width: 100%;
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 5px;
+            border: 1px solid #444;
+            background-color: #2e2e2e;
+            color: #fff;
         }
 
         .download-btn {
@@ -158,6 +177,19 @@
             background-color: #777;
         }
 
+        .toggle-btn {
+            background-color: #444;
+            color: white;
+            padding: 6px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .toggle-btn:hover {
+            background-color: #666;
+        }
+
         @media screen and (max-width: 600px) {
             .container {
                 padding: 15px;
@@ -168,7 +200,7 @@
             }
 
             audio {
-                width: 100px;
+                width: 80px;
             }
         }
     </style>
@@ -221,6 +253,9 @@
                     const soundtrackElement = document.createElement('div');
                     soundtrackElement.className = 'soundtrack';
 
+                    const soundtrackHeader = document.createElement('div');
+                    soundtrackHeader.className = 'soundtrack-header';
+
                     const coverImage = document.createElement('img');
                     coverImage.src = `Games/${encodePath(soundtrack.gameName)}/${encodePath(soundtrack.album)}/Cover.jpg`;
                     coverImage.alt = `${soundtrack.album} Cover`;
@@ -228,53 +263,33 @@
                     const title = document.createElement('h2');
                     title.textContent = `${soundtrack.gameName} - ${soundtrack.album}`;
 
-                    const trackList = document.createElement('div');
-                    trackList.className = 'track-list';
+                    soundtrackHeader.appendChild(coverImage);
+                    soundtrackHeader.appendChild(title);
+
+                    // Dropdown for tracklist
+                    const dropdown = document.createElement('select');
+                    dropdown.className = 'dropdown';
+                    dropdown.innerHTML = `<option value="">Select a track to play</option>`;
 
                     soundtrack.tracks.forEach(track => {
-                        const trackElement = document.createElement('div');
-                        trackElement.className = 'track';
-
-                        const trackInfo = document.createElement('div');
-                        trackInfo.className = 'track-info';
-
-                        const trackTitle = document.createElement('p');
-                        trackTitle.textContent = track.name;
-
-                        const audio = document.createElement('audio');
-                        audio.controls = true;
-                        const source = document.createElement('source');
-                        source.src = `Games/${encodePath(soundtrack.gameName)}/${encodePath(soundtrack.album)}/${encodePath(track.file)}`;
-                        source.type = 'audio/mpeg';
-                        audio.appendChild(source);
-
-                        // Add an event listener to update the currently playing track
-                        audio.addEventListener('play', () => {
-                            document.getElementById('currently-playing').textContent = `Now playing: ${track.name} from ${soundtrack.album}`;
-                        });
-
-                        audio.addEventListener('pause', () => {
-                            document.getElementById('currently-playing').textContent = `Paused: ${track.name} from ${soundtrack.album}`;
-                        });
-
-                        trackInfo.appendChild(trackTitle);
-                        trackInfo.appendChild(audio);
-
-                        const downloadButton = document.createElement('a');
-                        downloadButton.href = `Games/${encodePath(soundtrack.gameName)}/${encodePath(soundtrack.album)}/${encodePath(track.file)}`;
-                        downloadButton.className = 'download-btn';
-                        downloadButton.download = track.file;
-                        downloadButton.textContent = 'Download';
-
-                        trackElement.appendChild(trackInfo);
-                        trackElement.appendChild(downloadButton);
-
-                        trackList.appendChild(trackElement);
+                        const option = document.createElement('option');
+                        option.value = `Games/${encodePath(soundtrack.gameName)}/${encodePath(soundtrack.album)}/${encodePath(track.file)}`;
+                        option.textContent = track.name;
+                        dropdown.appendChild(option);
                     });
 
-                    soundtrackElement.appendChild(coverImage);
-                    soundtrackElement.appendChild(title);
-                    soundtrackElement.appendChild(trackList);
+                    dropdown.addEventListener('change', (e) => {
+                        const selectedTrack = e.target.value;
+                        if (selectedTrack) {
+                            const audio = new Audio(selectedTrack);
+                            audio.play();
+                            const selectedTrackName = e.target.options[e.target.selectedIndex].text;
+                            document.getElementById('currently-playing').textContent = `Now playing: ${selectedTrackName} from ${soundtrack.album}`;
+                        }
+                    });
+
+                    soundtrackElement.appendChild(soundtrackHeader);
+                    soundtrackElement.appendChild(dropdown);
 
                     grid.appendChild(soundtrackElement);
                 });
@@ -287,6 +302,7 @@
             }
         }
 
+        // Filter functionality for search
         function filterSoundtracks() {
             const input = document.getElementById('search-input');
             const filter = input.value.toLowerCase();
