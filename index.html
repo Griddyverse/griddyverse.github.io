@@ -75,12 +75,28 @@
     <!-- Soundtracks will be loaded here -->
   </div>
   <script>
+    // Function to encode URI components
+    function encodePath(path) {
+      return encodeURIComponent(path).replace(/%20/g, ' ');
+    }
+
     async function loadSoundtracks() {
       try {
         const response = await fetch('soundtracks.json');
+        if (!response.ok) {
+          throw new Error(`Network response was not ok: ${response.statusText}`);
+        }
         const data = await response.json();
+
+        console.log('Soundtracks data:', data);  // Debugging line
+
         const soundtracks = data.soundtracks;
         const container = document.getElementById('soundtracks-container');
+        
+        if (!soundtracks || soundtracks.length === 0) {
+          container.innerHTML = '<p>No soundtracks available.</p>';
+          return;
+        }
 
         soundtracks.forEach(soundtrack => {
           const soundtrackElement = document.createElement('div');
@@ -88,9 +104,9 @@
 
           // Create cover image element
           const coverImage = document.createElement('img');
-          coverImage.src = `Games/${soundtrack.gameName}/${soundtrack.album}/Cover.jpg`;
+          coverImage.src = `Games/${encodePath(soundtrack.gameName)}/${encodePath(soundtrack.album)}/Cover.jpg`;
           coverImage.alt = `${soundtrack.album} Cover`;
-          
+
           // Create soundtrack title and album
           const title = document.createElement('h2');
           title.textContent = `${soundtrack.gameName} - ${soundtrack.album}`;
@@ -109,12 +125,12 @@
             const audio = document.createElement('audio');
             audio.controls = true;
             const source = document.createElement('source');
-            source.src = `Games/${soundtrack.gameName}/${soundtrack.album}/${track.file}`;
+            source.src = `Games/${encodePath(soundtrack.gameName)}/${encodePath(soundtrack.album)}/${encodePath(track.file)}`;
             source.type = 'audio/mpeg';
             audio.appendChild(source);
 
             const downloadButton = document.createElement('a');
-            downloadButton.href = `Games/${soundtrack.gameName}/${soundtrack.album}/${track.file}`;
+            downloadButton.href = `Games/${encodePath(soundtrack.gameName)}/${encodePath(soundtrack.album)}/${encodePath(track.file)}`;
             downloadButton.className = 'download-btn';
             downloadButton.download = track.file;
             downloadButton.textContent = 'Download';
@@ -130,6 +146,8 @@
         });
       } catch (error) {
         console.error('Error loading soundtracks:', error);
+        const container = document.getElementById('soundtracks-container');
+        container.innerHTML = '<p>There was an error loading the soundtracks.</p>';
       }
     }
 
