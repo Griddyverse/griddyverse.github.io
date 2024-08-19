@@ -33,7 +33,6 @@
             font-size: 2.2rem;
         }
 
-        /* Search bar styling */
         .search-bar {
             display: flex;
             justify-content: center;
@@ -53,7 +52,6 @@
             font-size: 1rem;
         }
 
-        /* Display currently playing song */
         .currently-playing {
             margin-top: 10px;
             font-size: 1rem;
@@ -158,6 +156,34 @@
             background-color: #777;
         }
 
+        .player-controls {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #1e1e1e;
+            padding: 10px;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .player-controls button {
+            background-color: #333;
+            border: none;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .player-controls button:hover {
+            background-color: #555;
+        }
+
         @media screen and (max-width: 600px) {
             .container {
                 padding: 15px;
@@ -169,6 +195,10 @@
 
             audio {
                 width: 100px;
+            }
+
+            .player-controls button {
+                padding: 8px;
             }
         }
     </style>
@@ -189,102 +219,118 @@
         <p>Loading soundtracks...</p>
     </div>
 
+    <!-- Player Controls Bar -->
+    <div class="player-controls">
+        <button id="play-btn">Play</button>
+        <button id="pause-btn">Pause</button>
+        <button id="stop-btn">Stop</button>
+    </div>
+
     <script>
-        // Function to encode URI components
+        let currentAudio = null;
+        let timer = null;
+        const stopDelay = 5000; // Time in milliseconds before stopping playback
+
         function encodePath(path) {
             return encodeURIComponent(path).replace(/%20/g, ' ');
         }
 
-        async function loadSoundtracks() {
-            try {
-                const response = await fetch('soundtracks.json');
-                if (!response.ok) {
-                    throw new Error(`Network response was not ok: ${response.statusText}`);
-                }
-                const data = await response.json();
+        function loadSoundtracks() {
+            fetch('soundtracks.json')
+                .then(response => response.json())
+                .then(data => {
+                    const soundtracks = data.soundtracks;
+                    const container = document.getElementById('soundtracks-container');
+                    container.innerHTML = '';
 
-                const soundtracks = data.soundtracks;
-                const container = document.getElementById('soundtracks-container');
+                    if (!soundtracks || soundtracks.length === 0) {
+                        container.innerHTML = '<p>No soundtracks available.</p>';
+                        return;
+                    }
 
-                // Clear the loading text
-                container.innerHTML = '';
+                    const grid = document.createElement('div');
+                    grid.className = 'soundtrack-grid';
 
-                if (!soundtracks || soundtracks.length === 0) {
-                    container.innerHTML = '<p>No soundtracks available.</p>';
-                    return;
-                }
+                    soundtracks.forEach(soundtrack => {
+                        const soundtrackElement = document.createElement('div');
+                        soundtrackElement.className = 'soundtrack';
 
-                const grid = document.createElement('div');
-                grid.className = 'soundtrack-grid';
+                        const coverImage = document.createElement('img');
+                        coverImage.src = `Games/${encodePath(soundtrack.gameName)}/${encodePath(soundtrack.album)}/Cover.jpg`;
+                        coverImage.alt = `${soundtrack.album} Cover`;
 
-                soundtracks.forEach(soundtrack => {
-                    const soundtrackElement = document.createElement('div');
-                    soundtrackElement.className = 'soundtrack';
+                        const title = document.createElement('h2');
+                        title.textContent = `${soundtrack.gameName} - ${soundtrack.album}`;
 
-                    const coverImage = document.createElement('img');
-                    coverImage.src = `Games/${encodePath(soundtrack.gameName)}/${encodePath(soundtrack.album)}/Cover.jpg`;
-                    coverImage.alt = `${soundtrack.album} Cover`;
+                        const trackList = document.createElement('div');
+                        trackList.className = 'track-list';
 
-                    const title = document.createElement('h2');
-                    title.textContent = `${soundtrack.gameName} - ${soundtrack.album}`;
+                        soundtrack.tracks.forEach(track => {
+                            const trackElement = document.createElement('div');
+                            trackElement.className = 'track';
 
-                    const trackList = document.createElement('div');
-                    trackList.className = 'track-list';
+                            const trackInfo = document.createElement('div');
+                            trackInfo.className = 'track-info';
 
-                    soundtrack.tracks.forEach(track => {
-                        const trackElement = document.createElement('div');
-                        trackElement.className = 'track';
+                            const trackTitle = document.createElement('p');
+                            trackTitle.textContent = track.name;
 
-                        const trackInfo = document.createElement('div');
-                        trackInfo.className = 'track-info';
+                            const audio = document.createElement('audio');
+                            audio.controls = true;
+                            const source = document.createElement('source');
+                            source.src = `Games/${encodePath(soundtrack.gameName)}/${encodePath(soundtrack.album)}/${encodePath(track.file)}`;
+                            source.type = 'audio/mpeg';
+                            audio.appendChild(source);
 
-                        const trackTitle = document.createElement('p');
-                        trackTitle.textContent = track.name;
+                            audio.addEventListener('play', () => {
+                                document.getElementById('currently-playing').textContent = `Now playing: ${track.name} from ${soundtrack.album}`;
+                                currentAudio = audio;
 
-                        const audio = document.createElement('audio');
-                        audio.controls = true;
-                        const source = document.createElement('source');
-                        source.src = `Games/${encodePath(soundtrack.gameName)}/${encodePath(soundtrack.album)}/${encodePath(track.file)}`;
-                        source.type = 'audio/mpeg';
-                        audio.appendChild(source);
+                                // Reset and start timer when a song is played
+                                if (timer) {
+                                    clearTimeout(timer);
+                                }
+                                timer = setTimeout(() => {
+                                    if (currentAudio && !currentAudio.paused) {
+                                        currentAudio.pause();
+                                        document.getElementById('currently-playing').textContent = 'No song is playing.';
+                                    }
+                                }, stopDelay);
+                            });
 
-                        // Add an event listener to update the currently playing track
-                        audio.addEventListener('play', () => {
-                            document.getElementById('currently-playing').textContent = `Now playing: ${track.name} from ${soundtrack.album}`;
+                            audio.addEventListener('pause', () => {
+                                document.getElementById('currently-playing').textContent = `Paused: ${track.name} from ${soundtrack.album}`;
+                            });
+
+                            trackInfo.appendChild(trackTitle);
+                            trackInfo.appendChild(audio);
+
+                            const downloadButton = document.createElement('a');
+                            downloadButton.href = `Games/${encodePath(soundtrack.gameName)}/${encodePath(soundtrack.album)}/${encodePath(track.file)}`;
+                            downloadButton.className = 'download-btn';
+                            downloadButton.download = track.file;
+                            downloadButton.textContent = 'Download';
+
+                            trackElement.appendChild(trackInfo);
+                            trackElement.appendChild(downloadButton);
+
+                            trackList.appendChild(trackElement);
                         });
 
-                        audio.addEventListener('pause', () => {
-                            document.getElementById('currently-playing').textContent = `Paused: ${track.name} from ${soundtrack.album}`;
-                        });
+                        soundtrackElement.appendChild(coverImage);
+                        soundtrackElement.appendChild(title);
+                        soundtrackElement.appendChild(trackList);
 
-                        trackInfo.appendChild(trackTitle);
-                        trackInfo.appendChild(audio);
-
-                        const downloadButton = document.createElement('a');
-                        downloadButton.href = `Games/${encodePath(soundtrack.gameName)}/${encodePath(soundtrack.album)}/${encodePath(track.file)}`;
-                        downloadButton.className = 'download-btn';
-                        downloadButton.download = track.file;
-                        downloadButton.textContent = 'Download';
-
-                        trackElement.appendChild(trackInfo);
-                        trackElement.appendChild(downloadButton);
-
-                        trackList.appendChild(trackElement);
+                        grid.appendChild(soundtrackElement);
                     });
 
-                    soundtrackElement.appendChild(coverImage);
-                    soundtrackElement.appendChild(title);
-                    soundtrackElement.appendChild(trackList);
-
-                    grid.appendChild(soundtrackElement);
+                    container.appendChild(grid);
+                })
+                .catch(error => {
+                    console.error('Error loading soundtracks:', error);
+                    const container = document.getElementById('soundtracks-container');
+                    container.innerHTML = '<p>There was an error loading the soundtracks.</p>';
                 });
-
-                container.appendChild(grid);
-            } catch (error) {
-                console.error('Error loading soundtracks:', error);
-                const container = document.getElementById('soundtracks-container');
-                container.innerHTML = '<p>There was an error loading the soundtracks.</p>';
-            }
         }
 
         function filterSoundtracks() {
@@ -294,15 +340,31 @@
 
             soundtracks.forEach(soundtrack => {
                 const title = soundtrack.querySelector('h2').textContent.toLowerCase();
-                if (title.includes(filter)) {
-                    soundtrack.style.display = '';
-                } else {
-                    soundtrack.style.display = 'none';
-                }
+                soundtrack.style.display = title.includes(filter) ? '' : 'none';
             });
         }
 
         document.getElementById('search-input').addEventListener('input', filterSoundtracks);
+
+        document.getElementById('play-btn').addEventListener('click', () => {
+            if (currentAudio && currentAudio.paused) {
+                currentAudio.play();
+            }
+        });
+
+        document.getElementById('pause-btn').addEventListener('click', () => {
+            if (currentAudio) {
+                currentAudio.pause();
+            }
+        });
+
+        document.getElementById('stop-btn').addEventListener('click', () => {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+                document.getElementById('currently-playing').textContent = 'No song is playing.';
+            }
+        });
 
         document.addEventListener('DOMContentLoaded', loadSoundtracks);
     </script>
