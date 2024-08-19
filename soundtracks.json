@@ -110,6 +110,25 @@
                     "file": "26. Flow (Bonus Track).mp3"
                 }
             ]
+        },
+        {
+            "gameName": "Super Mario and the Rainbow Stars",
+            "album": "Super Mario and the Rainbow Stars OST",
+            "cover": "Cover.jpg",
+            "tracks": [
+                {
+                    "name": "Main Theme",
+                    "file": "01. Main Theme.mp3"
+                },
+                {
+                    "name": "Menu Theme",
+                    "file": "02. Menu Theme.mp3"
+                },
+                {
+                    "name": "Gallery Theme",
+                    "file": "03. Gallery Theme.mp3"
+                }
+            ]
         }
     ]
 }
