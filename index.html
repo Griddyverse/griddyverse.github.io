@@ -33,7 +33,6 @@
             font-size: 2.2rem;
         }
 
-        /* Search bar styling */
         .search-bar {
             display: flex;
             justify-content: center;
@@ -53,7 +52,6 @@
             font-size: 1rem;
         }
 
-        /* Display currently playing song */
         .currently-playing {
             margin-top: 10px;
             font-size: 1rem;
@@ -139,9 +137,35 @@
             color: #e0e0e0;
         }
 
-        audio {
-            width: 130px;
-            height: 28px;
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .audio-controls button {
+            background: #333;
+            border: none;
+            color: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 0 5px;
+            cursor: pointer;
+        }
+
+        .audio-controls button:hover {
+            background: #444;
+        }
+
+        .audio-controls input[type="range"] {
+            margin: 0 10px;
+            width: 200px;
+        }
+
+        .audio-controls span {
+            font-size: 0.85rem;
+            color: #e0e0e0;
         }
 
         .download-btn {
@@ -167,8 +191,8 @@
                 padding: 10px;
             }
 
-            audio {
-                width: 100px;
+            .audio-controls input[type="range"] {
+                width: 150px;
             }
         }
     </style>
@@ -189,11 +213,103 @@
         <p>Loading soundtracks...</p>
     </div>
 
+    <!-- Music Player Controls -->
+    <div class="audio-controls">
+        <button id="prev-track">Prev</button>
+        <button id="play-pause">Play</button>
+        <button id="next-track">Next</button>
+        <button id="shuffle">Shuffle</button>
+        <button id="repeat">Repeat</button>
+        <input type="range" id="seek-bar" min="0" max="100" value="0">
+        <span id="current-time">0:00</span> / <span id="duration">0:00</span>
+    </div>
+
     <script>
-        // Function to encode URI components
-        function encodePath(path) {
-            return encodeURIComponent(path).replace(/%20/g, ' ');
+        let audio = new Audio();
+        let isPlaying = false;
+        let isShuffling = false;
+        let isRepeating = false;
+        let currentTrackIndex = 0;
+        let tracks = [];
+        
+        function updateTime() {
+            const currentTime = Math.floor(audio.currentTime);
+            const duration = Math.floor(audio.duration);
+            const minutesCurrent = Math.floor(currentTime / 60);
+            const secondsCurrent = currentTime % 60;
+            const minutesDuration = Math.floor(duration / 60);
+            const secondsDuration = duration % 60;
+
+            document.getElementById('current-time').textContent = `${minutesCurrent}:${secondsCurrent.toString().padStart(2, '0')}`;
+            document.getElementById('duration').textContent = `${minutesDuration}:${secondsDuration.toString().padStart(2, '0')}`;
+            document.getElementById('seek-bar').value = (currentTime / duration) * 100;
         }
+
+        function loadTrack(index) {
+            if (tracks.length === 0) return;
+            audio.src = tracks[index].url;
+            audio.play();
+            isPlaying = true;
+            document.getElementById('play-pause').textContent = 'Pause';
+            updateCurrentlyPlaying();
+        }
+
+        function updateCurrentlyPlaying() {
+            document.getElementById('currently-playing').textContent = `Now playing: ${tracks[currentTrackIndex].name}`;
+        }
+
+        function nextTrack() {
+            currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+            loadTrack(currentTrackIndex);
+        }
+
+        function prevTrack() {
+            currentTrackIndex = (currentTrackIndex - 1 + tracks.length) % tracks.length;
+            loadTrack(currentTrackIndex);
+        }
+
+        function togglePlayPause() {
+            if (isPlaying) {
+                audio.pause();
+                isPlaying = false;
+                document.getElementById('play-pause').textContent = 'Play';
+            } else {
+                audio.play();
+                isPlaying = true;
+                document.getElementById('play-pause').textContent = 'Pause';
+            }
+        }
+
+        document.getElementById('play-pause').addEventListener('click', togglePlayPause);
+        document.getElementById('next-track').addEventListener('click', nextTrack);
+        document.getElementById('prev-track').addEventListener('click', prevTrack);
+
+        document.getElementById('seek-bar').addEventListener('input', (e) => {
+            const newTime = (e.target.value / 100) * audio.duration;
+            audio.currentTime = newTime;
+        });
+
+        audio.addEventListener('timeupdate', updateTime);
+
+        audio.addEventListener('ended', () => {
+            if (isRepeating) {
+                audio.play();
+            } else if (isShuffling) {
+                nextTrack();
+            } else {
+                nextTrack();
+            }
+        });
+
+        document.getElementById('shuffle').addEventListener('click', () => {
+            isShuffling = !isShuffling;
+            document.getElementById('shuffle').style.background = isShuffling ? '#444' : '#333';
+        });
+
+        document.getElementById('repeat').addEventListener('click', () => {
+            isRepeating = !isRepeating;
+            document.getElementById('repeat').style.background = isRepeating ? '#444' : '#333';
+        });
 
         async function loadSoundtracks() {
             try {
@@ -206,7 +322,6 @@
                 const soundtracks = data.soundtracks;
                 const container = document.getElementById('soundtracks-container');
 
-                // Clear the loading text
                 container.innerHTML = '';
 
                 if (!soundtracks || soundtracks.length === 0) {
@@ -231,7 +346,7 @@
                     const trackList = document.createElement('div');
                     trackList.className = 'track-list';
 
-                    soundtrack.tracks.forEach(track => {
+                    soundtrack.tracks.forEach((track, index) => {
                         const trackElement = document.createElement('div');
                         trackElement.className = 'track';
 
@@ -241,24 +356,15 @@
                         const trackTitle = document.createElement('p');
                         trackTitle.textContent = track.name;
 
-                        const audio = document.createElement('audio');
-                        audio.controls = true;
+                        const audioElement = document.createElement('audio');
+                        audioElement.controls = true;
                         const source = document.createElement('source');
                         source.src = `Games/${encodePath(soundtrack.gameName)}/${encodePath(soundtrack.album)}/${encodePath(track.file)}`;
                         source.type = 'audio/mpeg';
-                        audio.appendChild(source);
-
-                        // Add an event listener to update the currently playing track
-                        audio.addEventListener('play', () => {
-                            document.getElementById('currently-playing').textContent = `Now playing: ${track.name} from ${soundtrack.album}`;
-                        });
-
-                        audio.addEventListener('pause', () => {
-                            document.getElementById('currently-playing').textContent = `Paused: ${track.name} from ${soundtrack.album}`;
-                        });
+                        audioElement.appendChild(source);
 
                         trackInfo.appendChild(trackTitle);
-                        trackInfo.appendChild(audio);
+                        trackInfo.appendChild(audioElement);
 
                         const downloadButton = document.createElement('a');
                         downloadButton.href = `Games/${encodePath(soundtrack.gameName)}/${encodePath(soundtrack.album)}/${encodePath(track.file)}`;
@@ -268,6 +374,12 @@
 
                         trackElement.appendChild(trackInfo);
                         trackElement.appendChild(downloadButton);
+
+                        trackElement.addEventListener('click', () => {
+                            tracks = soundtrack.tracks.map(track => ({ name: track.name, url: `Games/${encodePath(soundtrack.gameName)}/${encodePath(soundtrack.album)}/${encodePath(track.file)}` }));
+                            currentTrackIndex = index;
+                            loadTrack(currentTrackIndex);
+                        });
 
                         trackList.appendChild(trackElement);
                     });
@@ -285,6 +397,10 @@
                 const container = document.getElementById('soundtracks-container');
                 container.innerHTML = '<p>There was an error loading the soundtracks.</p>';
             }
+        }
+
+        function encodePath(path) {
+            return encodeURIComponent(path).replace(/%20/g, ' ');
         }
 
         function filterSoundtracks() {
