@@ -1,231 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Griddyverse</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f7f7f7;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        .section-title {
-            margin-top: 50px;
-            margin-bottom: 30px;
-        }
-        .artwork-category img {
-            max-width: 100%;
-            border-radius: 8px;
-            position: relative;
-        }
-        .official-badge {
-            position: absolute;
-            top: 0;
-            left: 0;
-            background-color: #28a745;
-            color: white;
-            padding: 2px 5px;
-            border-top-right-radius: 5px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-        .category-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        .category-buttons .btn {
-            flex: 1;
-            margin-right: 10px;
-        }
-        .category-buttons .btn:last-child {
-            margin-right: 0;
-        }
-        footer {
-            margin-top: auto;
-            background-color: #343a40;
-            color: white;
-            text-align: center;
-            padding: 10px 0;
-            position: fixed;
-            width: 100%;
-            bottom: 0;
-        }
-        .audio-control {
-            width: 100%;
-            margin-bottom: 10px;
-        }
-        .track-list {
-            list-style-type: none;
-            padding-left: 0;
-        }
-        .track-list li {
-            margin-bottom: 10px;
-        }
-        .btn-sm {
-            font-size: 0.8rem;
-            padding: 5px 10px;
-        }
-        .hidden {
-            display: none;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Soundtracks</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      color: #333;
+    }
+    .container {
+      width: 80%;
+      margin: auto;
+      overflow: hidden;
+    }
+    header {
+      background: #333;
+      color: #fff;
+      padding-top: 30px;
+      min-height: 70px;
+      border-bottom: #fff 3px solid;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .soundtrack {
+      background: #fff;
+      border: 1px solid #ddd;
+      margin-bottom: 20px;
+      padding: 20px;
+      border-radius: 5px;
+    }
+    .soundtrack img {
+      width: 100%;
+      max-width: 300px;
+      border-radius: 5px;
+    }
+    .soundtrack h2 {
+      margin-top: 0;
+    }
+    .track {
+      margin-top: 10px;
+    }
+    audio {
+      width: 100%;
+      margin-top: 5px;
+    }
+    .download-btn {
+      display: inline-block;
+      padding: 10px 20px;
+      margin-top: 5px;
+      background-color: #333;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    .download-btn:hover {
+      background-color: #555;
+    }
+  </style>
 </head>
 <body>
-
-    <!-- Search Bar -->
-    <div class="container mt-4">
-        <form class="d-flex" onsubmit="return false;">
-            <input id="searchInput" class="form-control me-2" type="search" placeholder="Search for games or artwork..." aria-label="Search">
-            <button class="btn btn-outline-success" onclick="searchGames()">Search</button>
-        </form>
+  <header>
+    <div class="container">
+      <h1>Game Soundtracks</h1>
     </div>
+  </header>
+  <div class="container" id="soundtracks-container">
+    <!-- Soundtracks will be loaded here -->
+  </div>
+  <script>
+    async function loadSoundtracks() {
+      try {
+        const response = await fetch('soundtracks.json');
+        const data = await response.json();
+        const soundtracks = data.soundtracks;
+        const container = document.getElementById('soundtracks-container');
 
-    <!-- Game Sections -->
-    <div class="container section-title">
-        <!-- Super Mario and the Rainbow Stars -->
-        <div id="game1" class="game-section">
-            <h2>Super Mario and the Rainbow Stars</h2>
-            <hr>
+        soundtracks.forEach(soundtrack => {
+          const soundtrackElement = document.createElement('div');
+          soundtrackElement.className = 'soundtrack';
 
-            <!-- Category Buttons in a Horizontal Line -->
-            <div class="category-buttons">
-                <a class="btn btn-primary" data-bs-toggle="collapse" href="#backdrops2" role="button" aria-expanded="false" aria-controls="backdrops2">Backdrops</a>
-                <a class="btn btn-primary" data-bs-toggle="collapse" href="#clearart2" role="button" aria-expanded="false" aria-controls="clearart2">Clearart</a>
-                <a class="btn btn-primary" data-bs-toggle="collapse" href="#logos2" role="button" aria-expanded="false" aria-controls="logos2">Logos</a>
-                <a class="btn btn-primary" data-bs-toggle="collapse" href="#icons2" role="button" aria-expanded="false" aria-controls="icons2">Icons</a>
-            </div>
+          // Create cover image element
+          const coverImage = document.createElement('img');
+          coverImage.src = `Games/${soundtrack.gameName}/${soundtrack.album}/Cover.jpg`;
+          coverImage.alt = `${soundtrack.album} Cover`;
+          
+          // Create soundtrack title and album
+          const title = document.createElement('h2');
+          title.textContent = `${soundtrack.gameName} - ${soundtrack.album}`;
 
-            <!-- Artwork Sections -->
-            <div id="accordion2">
-                <!-- Backdrops Section -->
-                <div class="collapse" id="backdrops2" data-bs-parent="#accordion2">
-                    <div class="row">
-                        <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
-                            <div class="position-relative">
-                                <img src="https://github.com/Superstarshi/Superstarshi.github.io/blob/main/smatrs/assets/site_bg.png?raw=true" alt="Background 1" class="img-fluid">
-                                <span class="official-badge">Official</span>
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
-                            <div class="position-relative">
-                                <img src="https://github.com/Superstarshi/Superstarshi.github.io/blob/main/smatrs/assets/site_bg2.png?raw=true" alt="Background 2" class="img-fluid">
-                                <span class="official-badge">Official</span>
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
-                            <div class="position-relative">
-                                <img src="https://github.com/Superstarshi/Superstarshi.github.io/blob/main/smatrs/assets/site_bg3.png?raw=true" alt="Background 3" class="img-fluid">
-                                <span class="official-badge">Official</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+          soundtrackElement.appendChild(coverImage);
+          soundtrackElement.appendChild(title);
 
-                <!-- Clearart Section -->
-                <div class="collapse" id="clearart2" data-bs-parent="#accordion2">
-                    <div class="row">
-                        <!-- Add clearart artwork here -->
-                    </div>
-                </div>
+          // Create track list
+          soundtrack.tracks.forEach(track => {
+            const trackElement = document.createElement('div');
+            trackElement.className = 'track';
 
-                <!-- Logos Section -->
-                <div class="collapse" id="logos2" data-bs-parent="#accordion2">
-                    <div class="row">
-                        <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
-                            <div class="position-relative">
-                                <img src="https://web.archive.org/web/20240816221437im_/https://superstarshi.github.io/smatrs/assets/logo.png" alt="Super Mario Logo" class="img-fluid">
-                                <span class="official-badge">Official</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            const trackTitle = document.createElement('p');
+            trackTitle.textContent = track.name;
 
-                <!-- Icons Section -->
-                <div class="collapse" id="icons2" data-bs-parent="#accordion2">
-                    <div class="row">
-                        <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
-                            <div class="position-relative">
-                                <img src="https://web.archive.org/web/20240816210838im_/https://superstarshi.github.io/smatrs/assets/header_logo.png" alt="Super Mario Icon" class="img-fluid">
-                                <span class="official-badge">Official</span>
-                            </div>
-                        </div>
-                        <!-- Add more icon artwork here -->
-                    </div>
-                </div>
-            </div>
+            const audio = document.createElement('audio');
+            audio.controls = true;
+            const source = document.createElement('source');
+            source.src = `Games/${soundtrack.gameName}/${soundtrack.album}/${track.file}`;
+            source.type = 'audio/mpeg';
+            audio.appendChild(source);
 
-            <!-- Music Section for the Game -->
-            <div class="section-title mt-4">
-                <h3>Soundtrack</h3>
-                <hr>
-                <!-- Album Cover and Track List -->
-                <div class="row">
-                    <!-- Album Cover -->
-                    <div class="col-lg-4 col-md-6 mb-3">
-                        <img src="https://via.placeholder.com/300x300.png?text=Album+Cover" alt="Album Cover" class="img-fluid">
-                    </div>
-                    <!-- Collapsible Track List -->
-                    <div class="col-lg-8 col-md-6 mb-3">
-                        <h4>Album Title</h4>
-                        <a class="btn btn-outline-primary" data-bs-toggle="collapse" href="#trackList" role="button" aria-expanded="false" aria-controls="trackList">
-                            Show Track List
-                        </a>
-                        <div class="collapse" id="trackList">
-                            <ul class="track-list mt-3">
-                                <li>
-                                    <h5>Track 1 - "Adventure Begins"</h5>
-                                    <audio controls class="audio-control">
-                                        <source src="https://example.com/track1.mp3" type="audio/mpeg">
-                                        Your browser does not support the audio element.
-                                    </audio>
-                                    <a href="https://example.com/track1.mp3" download="Track 1 - Adventure Begins" class="btn btn-outline-primary btn-sm">Download</a>
-                                </li>
-                                <li>
-                                    <h5>Track 2 - "Into the Stars"</h5>
-                                    <audio controls class="audio-control">
-                                        <source src="https://example.com/track2.mp3" type="audio/mpeg">
-                                        Your browser does not support the audio element.
-                                    </audio>
-                                    <a href="https://example.com/track2.mp3" download="Track 2 - Into the Stars" class="btn btn-outline-primary btn-sm">Download</a>
-                                </li>
-                                <!-- Add more tracks as needed -->
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+            const downloadButton = document.createElement('a');
+            downloadButton.href = `Games/${soundtrack.gameName}/${soundtrack.album}/${track.file}`;
+            downloadButton.className = 'download-btn';
+            downloadButton.download = track.file;
+            downloadButton.textContent = 'Download';
 
-        <!-- Add more game sections here -->
-    </div>
+            trackElement.appendChild(trackTitle);
+            trackElement.appendChild(audio);
+            trackElement.appendChild(downloadButton);
 
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2024 Griddyverse. All rights reserved.</p>
-    </footer>
+            soundtrackElement.appendChild(trackElement);
+          });
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+          container.appendChild(soundtrackElement);
+        });
+      } catch (error) {
+        console.error('Error loading soundtracks:', error);
+      }
+    }
 
-    <!-- JavaScript for Search -->
-    <script>
-        function searchGames() {
-            const searchInput = document.getElementById('searchInput').value.toLowerCase();
-            const gameSections = document.querySelectorAll('.game-section');
-
-            gameSections.forEach(section => {
-                const gameName = section.querySelector('h2').textContent.toLowerCase();
-                if (gameName.includes(searchInput)) {
-                    section.classList.remove('hidden');
-                } else {
-                    section.classList.add('hidden');
-                }
-            });
-        }
-    </script>
+    document.addEventListener('DOMContentLoaded', loadSoundtracks);
+  </script>
 </body>
 </html>
