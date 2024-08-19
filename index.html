@@ -54,9 +54,25 @@
             width: 100%;
             bottom: 0;
         }
+        .audio-control {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .track-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .track-list li {
+            margin-bottom: 10px;
+        }
+        .btn-sm {
+            font-size: 0.8rem;
+            padding: 5px 10px;
+        }
     </style>
 </head>
 <body>
+
     <!-- Search Bar -->
     <div class="container mt-4">
         <form class="d-flex">
@@ -72,26 +88,35 @@
 
         <!-- Category Buttons in a Horizontal Line -->
         <div class="category-buttons">
-            <a class="btn btn-primary" data-bs-toggle="collapse" href="#backdrops2" role="button" aria-expanded="false" aria-controls="backdrops2">
-                Backdrops
-            </a>
-            <a class="btn btn-primary" data-bs-toggle="collapse" href="#clearart2" role="button" aria-expanded="false" aria-controls="clearart2">
-                Clearart
-            </a>
-            <a class="btn btn-primary" data-bs-toggle="collapse" href="#logos2" role="button" aria-expanded="false" aria-controls="logos2">
-                Logos
-            </a>
-            <a class="btn btn-primary" data-bs-toggle="collapse" href="#icons2" role="button" aria-expanded="false" aria-controls="icons2">
-                Icons
-            </a>
+            <a class="btn btn-primary" data-bs-toggle="collapse" href="#backdrops2" role="button" aria-expanded="false" aria-controls="backdrops2">Backdrops</a>
+            <a class="btn btn-primary" data-bs-toggle="collapse" href="#clearart2" role="button" aria-expanded="false" aria-controls="clearart2">Clearart</a>
+            <a class="btn btn-primary" data-bs-toggle="collapse" href="#logos2" role="button" aria-expanded="false" aria-controls="logos2">Logos</a>
+            <a class="btn btn-primary" data-bs-toggle="collapse" href="#icons2" role="button" aria-expanded="false" aria-controls="icons2">Icons</a>
         </div>
 
-        <!-- Artwork Sections (Collapsible and Mutually Exclusive) -->
+        <!-- Artwork Sections -->
         <div id="accordion2">
             <!-- Backdrops Section -->
             <div class="collapse" id="backdrops2" data-bs-parent="#accordion2">
                 <div class="row">
-                    <!-- Add backdrop artwork here -->
+                    <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                        <div class="position-relative">
+                            <img src="https://github.com/Superstarshi/Superstarshi.github.io/blob/main/smatrs/assets/site_bg.png?raw=true" alt="Background 1" class="img-fluid">
+                            <span class="official-badge">Official</span>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                        <div class="position-relative">
+                            <img src="https://github.com/Superstarshi/Superstarshi.github.io/blob/main/smatrs/assets/site_bg2.png?raw=true" alt="Background 2" class="img-fluid">
+                            <span class="official-badge">Official</span>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                        <div class="position-relative">
+                            <img src="https://github.com/Superstarshi/Superstarshi.github.io/blob/main/smatrs/assets/site_bg3.png?raw=true" alt="Background 3" class="img-fluid">
+                            <span class="official-badge">Official</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -124,6 +149,46 @@
                         </div>
                     </div>
                     <!-- Add more icon artwork here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Music Section -->
+    <div class="container section-title">
+        <h2>Soundtrack</h2>
+        <hr>
+        <div class="row">
+            <!-- Album Cover -->
+            <div class="col-lg-4 col-md-6 mb-3">
+                <img src="https://via.placeholder.com/300x300.png?text=Album+Cover" alt="Album Cover" class="img-fluid">
+            </div>
+            <!-- Collapsible Track List -->
+            <div class="col-lg-8 col-md-6 mb-3">
+                <h4>Album Title</h4>
+                <a class="btn btn-outline-primary" data-bs-toggle="collapse" href="#trackList" role="button" aria-expanded="false" aria-controls="trackList">
+                    Show Track List
+                </a>
+                <div class="collapse" id="trackList">
+                    <ul class="track-list mt-3">
+                        <li>
+                            <h5>Track 1 - "Adventure Begins"</h5>
+                            <audio controls class="audio-control">
+                                <source src="https://example.com/track1.mp3" type="audio/mpeg">
+                                Your browser does not support the audio element.
+                            </audio>
+                            <a href="https://example.com/track1.mp3" download="Track 1 - Adventure Begins" class="btn btn-outline-primary btn-sm">Download</a>
+                        </li>
+                        <li>
+                            <h5>Track 2 - "Into the Stars"</h5>
+                            <audio controls class="audio-control">
+                                <source src="https://example.com/track2.mp3" type="audio/mpeg">
+                                Your browser does not support the audio element.
+                            </audio>
+                            <a href="https://example.com/track2.mp3" download="Track 2 - Into the Stars" class="btn btn-outline-primary btn-sm">Download</a>
+                        </li>
+                        <!-- Add more tracks as needed -->
+                    </ul>
                 </div>
             </div>
         </div>
